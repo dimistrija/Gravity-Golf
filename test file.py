@@ -11,7 +11,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720
 BALL_H = 66
 BALL_W = 30
 TARGET_ZONE_SIZE = 60
-OBJECT_SIZE = 40
+OBJECT_SIZE = 50
 
 LEVELS = [
     {'background': 'assets/bck1.png', 'target': (60, SCREEN_HEIGHT - 60)},
@@ -73,7 +73,7 @@ def game_over():
     end_screen = pygame.transform.scale(end_screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(end_screen, (0, 0))
     pygame.display.flip()
-    pygame.time.wait(15000)
+    pygame.time.wait(10000)
     pygame.quit()
     sys.exit()
 
@@ -83,7 +83,7 @@ def bounce_ball():
     if ball_position[1] <= 0 or ball_position[1] >= SCREEN_HEIGHT:
         ball_velocity[1] = -ball_velocity[1]
 
-def spawn_custom_objects(num_objects):
+def spawn_objects(num_objects):
     for _ in range(num_objects):
         x = random.randint(OBJECT_SIZE, SCREEN_WIDTH - OBJECT_SIZE)
         y = random.randint(OBJECT_SIZE, SCREEN_HEIGHT - OBJECT_SIZE)
@@ -92,7 +92,7 @@ def spawn_custom_objects(num_objects):
 
 # Main game loop
 running = True
-spawn_custom_objects(3)  # Initial spawn of 3 custom objects
+spawn_objects(3)
 
 while running:
     background = load_background(current_level)
@@ -164,7 +164,7 @@ while running:
             display_start_time = pygame.time.get_ticks()
 
             if not custom_objects:  # If all objects are collected, spawn new ones
-                spawn_custom_objects(3)
+                spawn_objects(3)
 
     # Draw the pointer
     mouse_pos = pygame.mouse.get_pos()
