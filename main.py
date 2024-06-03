@@ -5,6 +5,10 @@ import random
 
 # Initialize Pygame
 pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load('assets/stars-of-the-lid.flac')
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.03)
 
 # Constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720
@@ -17,11 +21,11 @@ LEVELS = [
     {'background': 'assets/intro.png', 'target': (SCREEN_WIDTH // 2, SCREEN_HEIGHT, 200, 100),
      'gravity_zones': [(60, 60, 350, 2)]},
     {'background': 'assets/bck1.png', 'target': (60, SCREEN_HEIGHT - 60), 'spawn': (1200, 30),
-     'gravity_zones': [(100, 120, 150, 0.4), (620, 700, 150, 0.3), (640, 360, 240, 0.7), (1100, 600, 200, 0.3)]},
+     'gravity_zones': [(100, 120, 150, 0.4), (620, 700, 160, 0.4), (640, 360, 240, 0.85), (1130, 650, 200, 0.4)]},
     {'background': 'assets/bck2.png', 'target': (SCREEN_WIDTH - 60, SCREEN_HEIGHT - 60), 'spawn': (30, 30),
-     'gravity_zones': [(240,80, 150, 0.35), (600, 460, 220, 0.7), (140, 600, 170, 0.35), (960, 250, 310, 0.35)]},
+     'gravity_zones': [(240,80, 150, 0.4), (600, 460, 220, 0.85), (140, 600, 170, 0.45), (960, 250, 330, 0.5)]},
     {'background': 'assets/bck3.png', 'target': (SCREEN_WIDTH - 60, 60), 'spawn': (40, 650),
-     'gravity_zones': [(260, 480, 160, 0.35), (700, 700, 220, 0.7), (320, 60, 150, 0.35), (900, 240, 140, 0.35)]}
+     'gravity_zones': [(260, 480, 170, 0.4), (700, 700, 220, 0.85), (320, 60, 150, 0.4), (900, 240, 150, 0.4)]}
 ]
 
 END_SCREEN_IMG = 'assets/end.png'
@@ -240,6 +244,8 @@ while running:
     pygame.display.flip()
     pygame.time.Clock().tick(60)
 
+pygame.mixer.music.stop()
+pygame.mixer.quit()
 pygame.quit()
 sys.exit()
 
