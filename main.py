@@ -14,8 +14,8 @@ TARGET_ZONE_SIZE = 60
 OBJECT_SIZE = 45
 #assets lvls etc.
 LEVELS = [
-    {'background': 'assets/intro.png', 'target': (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 25, 60, 50),
-     'gravity_zones': [(60, 60, 400, 2)]},
+    {'background': 'assets/intro.png', 'target': (SCREEN_WIDTH // 2, SCREEN_HEIGHT, 200, 100),
+     'gravity_zones': [(60, 60, 350, 2)]},
     {'background': 'assets/bck1.png', 'target': (60, SCREEN_HEIGHT - 60), 'spawn': (1200, 30),
      'gravity_zones': [(100, 120, 150, 0.4), (620, 700, 150, 0.3), (640, 360, 240, 0.7), (1100, 600, 200, 0.3)]},
     {'background': 'assets/bck2.png', 'target': (SCREEN_WIDTH - 60, SCREEN_HEIGHT - 60), 'spawn': (30, 30),
