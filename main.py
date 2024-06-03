@@ -14,15 +14,24 @@ TARGET_ZONE_SIZE = 60
 OBJECT_SIZE = 45
 #assets lvls etc.
 LEVELS = [
-    {'background': 'assets/intro.png', 'target': (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 25, 60, 50)},
-    {'background': 'assets/bck1.png', 'target': (60, SCREEN_HEIGHT - 60), 'spawn': (1200, 30)},
-    {'background': 'assets/bck2.png', 'target': (SCREEN_WIDTH - 60, SCREEN_HEIGHT - 60), 'spawn': (30, 30)},
-    {'background': 'assets/bck3.png', 'target': (SCREEN_WIDTH - 60, 60), 'spawn': (40, 650)}
+    {'background': 'assets/intro.png', 'target': (SCREEN_WIDTH // 2, SCREEN_HEIGHT - 25, 60, 50),
+     'gravity_zones': [(60, 60, 400, 2)]},
+    {'background': 'assets/bck1.png', 'target': (60, SCREEN_HEIGHT - 60), 'spawn': (1200, 30),
+     'gravity_zones': [(100, 120, 150, 0.4), (620, 700, 150, 0.3), (640, 360, 240, 0.7), (1100, 600, 200, 0.3)]},
+    {'background': 'assets/bck2.png', 'target': (SCREEN_WIDTH - 60, SCREEN_HEIGHT - 60), 'spawn': (30, 30),
+     'gravity_zones': [(240,80, 150, 0.35), (600, 460, 220, 0.7), (140, 600, 170, 0.35), (960, 250, 310, 0.35)]},
+    {'background': 'assets/bck3.png', 'target': (SCREEN_WIDTH - 60, 60), 'spawn': (40, 650),
+     'gravity_zones': [(260, 480, 160, 0.35), (700, 700, 220, 0.7), (320, 60, 150, 0.35), (900, 240, 140, 0.35)]}
 ]
+
 END_SCREEN_IMG = 'assets/end.png'
 POINTER_IMG = 'assets/pointer.png'
-OBJECT_IMGS = ['assets/cat1.png', 'assets/cat2.png', 'assets/cat3.png']
+OBJECT_IMGS = ['assets/cat1.png', 'assets/cat3.png', 'assets/cat2.png']
 SAVED_IMG = 'assets/saved.png'
+BLACKHOLE_IMG = 'assets/blackhole.png'
+blackhole_img = pygame.image.load(BLACKHOLE_IMG)
+blackhole_img = pygame.transform.scale(blackhole_img, (SCREEN_WIDTH, SCREEN_HEIGHT))  # Adjust size as needed
+
 saved_img = pygame.image.load(SAVED_IMG)
 saved_img = pygame.transform.scale(saved_img, (333, 53))
 
@@ -37,7 +46,7 @@ pygame.display.set_caption("Space.. I mean Gravity Golf!")
 ball_img = pygame.image.load('assets/ball.png')
 ball_img = pygame.transform.scale(ball_img, (BALL_H, BALL_W))
 pointer_img = pygame.image.load(POINTER_IMG)
-pointer_img = pygame.transform.scale(pointer_img, (120, 5))
+pointer_img = pygame.transform.scale(pointer_img, (170, 5))
 object_imgs = [pygame.image.load(img) for img in OBJECT_IMGS]
 object_imgs = [pygame.transform.scale(img, (OBJECT_SIZE, OBJECT_SIZE)) for img in object_imgs]
 
@@ -51,7 +60,26 @@ hold_time = 0
 custom_objects = []
 display_collected = False
 display_start_time = 0
+blackhole_displayed = False
+blackhole_start_time = None
 
+
+
+def apply_gravity(ball_pos, ball_vel, gravity_zones, damping_factor=0.8):
+    for (gx, gy, radius, strength) in gravity_zones:
+        dx = gx - ball_pos[0]
+        dy = gy - ball_pos[1]
+        distance = math.hypot(dx, dy)
+        if distance < radius:
+            # Normalize the direction
+            if distance != 0:
+                dx /= distance
+                dy /= distance
+            # Apply gravitational force with damping
+            force = (1 - distance / radius) * strength
+            ball_vel[0] += dx * force * damping_factor
+            ball_vel[1] += dy * force * damping_factor
+    return ball_vel
 
 
 def load_background(level):
@@ -72,7 +100,7 @@ def check_collision(pos, target):
 
 
 def check_object_collision(ball_pos, obj_pos):
-    extra = 10  #extra size helping collision
+    extra = 13  #extra size helping collision
     return (obj_pos[0] - OBJECT_SIZE / 2 - extra <= ball_pos[0] <= obj_pos[0] + OBJECT_SIZE / 2 + extra and
             obj_pos[1] - OBJECT_SIZE / 2 - extra <= ball_pos[1] <= obj_pos[1] + OBJECT_SIZE / 2 + extra)
 
@@ -86,11 +114,23 @@ def game_over():
     pygame.quit()
     sys.exit()
 
+
+DAMPING_FACTOR = 0.6
 def bounce_ball():
-    if ball_position[0] <= 0 or ball_position[0] >= SCREEN_WIDTH:
-        ball_velocity[0] = -ball_velocity[0]
-    if ball_position[1] <= 0 or ball_position[1] >= SCREEN_HEIGHT:
-        ball_velocity[1] = -ball_velocity[1]
+    if ball_position[0] <= 0:
+        ball_position[0] = 0
+        ball_velocity[0] = -ball_velocity[0] * DAMPING_FACTOR
+    elif ball_position[0] >= SCREEN_WIDTH:
+        ball_position[0] = SCREEN_WIDTH
+        ball_velocity[0] = -ball_velocity[0] * DAMPING_FACTOR
+
+    if ball_position[1] <= 0:
+        ball_position[1] = 0
+        ball_velocity[1] = -ball_velocity[1] * DAMPING_FACTOR
+    elif ball_position[1] >= SCREEN_HEIGHT:
+        ball_position[1] = SCREEN_HEIGHT
+        ball_velocity[1] = -ball_velocity[1] * DAMPING_FACTOR
+
 
 def spawn_objects(num_objects):
     for _ in range(num_objects):
@@ -101,7 +141,7 @@ def spawn_objects(num_objects):
 
 # Main game loop
 running = True
-spawn_objects(3)
+spawn_objects(4)
 
 while running:
     background = load_background(current_level)
@@ -119,11 +159,12 @@ while running:
             dx = mouse_pos[0] - ball_position[0]
             dy = mouse_pos[1] - ball_position[1]
             distance = math.hypot(dx, dy)
-            power = min(15, hold_time * 5)  # maximum power capped at 15
+            power = min(16, hold_time * 7)  # maximum power
             ball_velocity = [dx / distance * power, dy / distance * power]
             shooting = True
 
     if shooting:
+        ball_velocity = apply_gravity(ball_position, ball_velocity, LEVELS[current_level].get('gravity_zones', []))
         ball_position[0] += ball_velocity[0]
         ball_position[1] += ball_velocity[1]
         ball_velocity[0] *= 0.99  # simulate friction
@@ -150,12 +191,21 @@ while running:
     else:
         screen.blit(ball_img, (ball_position[0] - BALL_H // 2, ball_position[1] - BALL_W // 2))
 
+    # Blackhole display logic
+    if current_level == 0 and 0 <= ball_position[0] <= 150 and 0 <= ball_position[1] <= 150:
+        if not blackhole_displayed:
+            if blackhole_start_time is None:
+                blackhole_start_time = pygame.time.get_ticks()
+            elif pygame.time.get_ticks() - blackhole_start_time >= 7000:
+                blackhole_displayed = True
+                blackhole_display_start_time = pygame.time.get_ticks()
+        if blackhole_displayed:
+            screen.blit(blackhole_img, (
+            SCREEN_WIDTH // 2 - blackhole_img.get_width() // 2, SCREEN_HEIGHT // 2 - blackhole_img.get_height() // 2))
+            if pygame.time.get_ticks() - blackhole_display_start_time >= 15000:
+                running = False
 
-
-
-
-
-    #kittiess
+    # kittiess
     if current_level == 0:
         pass
     else:
@@ -178,7 +228,7 @@ while running:
             display_start_time = pygame.time.get_ticks()
 
             if not custom_objects:  # If all objects are collected, spawn new ones
-                spawn_objects(3)
+                spawn_objects(4)
 
     # Draw the pointer
     mouse_pos = pygame.mouse.get_pos()
@@ -192,3 +242,4 @@ while running:
 
 pygame.quit()
 sys.exit()
+
