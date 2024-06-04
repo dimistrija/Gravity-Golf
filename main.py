@@ -6,7 +6,7 @@ import random
 # Initializing game and music
 pygame.init()
 pygame.mixer.init()
-pygame.mixer.music.load('assets/stars-of-the-lid.flac')
+pygame.mixer.music.load('assets/stars-of-the-lidmp3.mp3') # got original .flac but it's 40MBs, mp3 was 10 :)
 pygame.mixer.music.play(-1) #(-1)==music loops
 pygame.mixer.music.set_volume(0.03)
 
@@ -20,22 +20,25 @@ ball_velocity = [0, 0]
 shooting = False
 click_start_time = None
 hold_time = 0
+# hard to "balance" between fair and overpowered when you take grav zoens into account
+max_power, hold_power = [16, 7]
 custom_objects = []
 display_collected = False
 display_start_time = 0
 blackhole_displayed = False
 blackhole_start_time = None
 
-# Levels dictionary: including spawn locations, gravity zones (x,y,radius,pull), and next lvl 'target'
+# Levels dictionary: magic numbers are pixels, and grav zones values
+# including spawn locations, gravity zones (x,y,radius,pull), and next lvl 'target' zones
 LEVELS = [
     {'background': 'assets/intro.png', 'target': (SCREEN_WIDTH // 2, SCREEN_HEIGHT, 200, 100),
      'gravity_zones': [(60, 60, 350, 2)]},
     {'background': 'assets/bck1.png', 'target': (60, SCREEN_HEIGHT - 60), 'spawn': (1200, 30),
-     'gravity_zones': [(100, 120, 150, 0.4), (620, 700, 160, 0.4), (640, 360, 240, 0.85), (1130, 650, 200, 0.4)]},
+     'gravity_zones': [(100, 120, 150, 0.4), (620, 700, 170, 0.45), (640, 360, 290, 0.8), (1130, 650, 200, 0.4)]},
     {'background': 'assets/bck2.png', 'target': (SCREEN_WIDTH - 60, SCREEN_HEIGHT - 60), 'spawn': (30, 30),
-     'gravity_zones': [(240,80, 150, 0.4), (600, 460, 220, 0.85), (140, 600, 170, 0.45), (960, 250, 330, 0.5)]},
+     'gravity_zones': [(240,80, 150, 0.4), (600, 460, 290, 0.85), (140, 600, 170, 0.45), (960, 250, 330, 0.55)]},
     {'background': 'assets/bck3.png', 'target': (SCREEN_WIDTH - 60, 60), 'spawn': (40, 650),
-     'gravity_zones': [(260, 480, 170, 0.4), (700, 700, 220, 0.85), (320, 60, 150, 0.4), (900, 240, 150, 0.4)]}
+     'gravity_zones': [(260, 480, 170, 0.4), (700, 700, 290, 0.85), (320, 60, 150, 0.4), (900, 240, 150, 0.4)]}
 ]
 #Assets stuff
 END_SCREEN_IMG = 'assets/end.png'
@@ -60,8 +63,8 @@ pygame.display.set_caption("Space.. I mean Gravity Golf!")
 
 def apply_gravity(ball_pos, ball_vel, gravity_zones, damping_factor=0.8):
     """
-        Applies gravitational forces from the current zone to the ball's velocity and
-        updates its velocity. Force is proportional to the center-ball distance and inverse
+        Applies velocity changes from current 'gravity zone' to the ball and
+        updates its velocity. Force is proportional to the center-to-ball distance and inverse
         for zone's radius.
      """
     for (gx, gy, radius, strength) in gravity_zones:
@@ -74,7 +77,7 @@ def apply_gravity(ball_pos, ball_vel, gravity_zones, damping_factor=0.8):
                 dx /= distance
                 dy /= distance
             force = (1 - distance / radius) * strength
-            ball_vel[0] += dx * force * damping_factor #damping for more fluid feel
+            ball_vel[0] += dx * force * damping_factor #damping factor helps movement feel more fluid
             ball_vel[1] += dy * force * damping_factor
     return ball_vel
 
@@ -94,9 +97,9 @@ def rotate_image(image, angle):
 # target zone to proceede level 60x60 pixel
 def check_collision(pos, target):
     """
-    Function to check collision with next level target, with an adjustment for level 0.
+    Function to check collision with target area to switch levels, with an adjustment for level 0.
     """
-
+#sloppy but works
     if current_level == 0:
         target_x, target_y, target_width, target_height = target
         return (target_x - target_width // 2 <= pos[0] <= target_x + target_width // 2 and
@@ -109,7 +112,7 @@ def check_collision(pos, target):
 def check_object_collision(ball_pos, obj_pos):
     """ Function checking object collision between the player and the spawned objects.
     """
-    extra = 13  #extra size helping collision
+    extra = 13  #extra variable for better collision detection
     return (obj_pos[0] - OBJECT_SIZE / 2 - extra <= ball_pos[0] <= obj_pos[0] + OBJECT_SIZE / 2 + extra and
             obj_pos[1] - OBJECT_SIZE / 2 - extra <= ball_pos[1] <= obj_pos[1] + OBJECT_SIZE / 2 + extra)
 
@@ -126,7 +129,7 @@ def game_over():
     sys.exit()
 
 
-DAMPING_FACTOR = 0.6
+DAMPING_FACTOR = 0.6 #helps make the bounce "feel" better
 def bounce_ball():
     """ Function for wall bouncing and collision.
     """
@@ -146,7 +149,7 @@ def bounce_ball():
 
 
 def spawn_objects(num_objects):
-    """ Function to spawn in collectible objects.
+    """ Function to spawn in collectible objects randomly inside the play area.
     """
     for _ in range(num_objects):
         x = random.randint(OBJECT_SIZE, SCREEN_WIDTH - OBJECT_SIZE)
@@ -167,14 +170,14 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN and not shooting:
             click_start_time = pygame.time.get_ticks()
         elif event.type == pygame.MOUSEBUTTONUP and not shooting and click_start_time:
-            hold_time = (pygame.time.get_ticks() - click_start_time) / 400  # hold time in seconds
+            hold_time = (pygame.time.get_ticks() - click_start_time) / 400
             click_start_time = None
             mouse_pos = pygame.mouse.get_pos()
             dx = mouse_pos[0] - ball_position[0]
             dy = mouse_pos[1] - ball_position[1]
             distance = math.hypot(dx, dy)
-            power = min(16, hold_time * 7)  # maximum power
-            ball_velocity = [dx / distance * power, dy / distance * power]
+            power = min(max_power, hold_time * hold_power)
+            ball_velocity = [dx / distance * power, dy / distance * power] #easy way to shoot in mouse direction
             shooting = True
 
     if shooting:
@@ -184,11 +187,11 @@ while running:
         ball_position[1] += ball_velocity[1]
         ball_velocity[0] *= 0.99  # simulate friction
         ball_velocity[1] *= 0.99  # simulate friction
-        if math.hypot(ball_velocity[0], ball_velocity[1]) < 0.95:  # forces ball to stop earlier, can continue playing faster
+        if math.hypot(ball_velocity[0], ball_velocity[1]) < 0.99:  # forces ball to stop earlier, can continue playing faster
             ball_velocity = [0, 0]
             shooting = False
         bounce_ball()
-        #check for next lvl switch + new lvl spawn
+        #check for next lvl switch + new lvl spawn location
         if check_collision(ball_position, LEVELS[current_level]['target']):
             shooting = False
             current_level += 1
@@ -198,10 +201,10 @@ while running:
             else:
                 ball_position = list(LEVELS[current_level]['spawn'])
 
-    # rotating the ball in the velocity direction
+    # rotating the ball with math :)
     if ball_velocity != [0, 0]:
         angle = math.degrees(math.atan2(ball_velocity[1], ball_velocity[0]))
-        rotated_ball = rotate_image(ball_img, -angle)  # Rotate to face the direction of movement
+        rotated_ball = rotate_image(ball_img, -angle)
         ball_rect = rotated_ball.get_rect(center=(ball_position[0], ball_position[1]))
         screen.blit(rotated_ball, ball_rect.topleft)
     else:
@@ -212,13 +215,14 @@ while running:
         if not blackhole_displayed:
             if blackhole_start_time is None:
                 blackhole_start_time = pygame.time.get_ticks()
+                #7ish seconds to give enough time for BHole to give the "being sucked in" effect ;)
             elif pygame.time.get_ticks() - blackhole_start_time >= 7000:
                 blackhole_displayed = True
                 blackhole_display_start_time = pygame.time.get_ticks()
         if blackhole_displayed:
             screen.blit(blackhole_img, (
             SCREEN_WIDTH // 2 - blackhole_img.get_width() // 2, SCREEN_HEIGHT // 2 - blackhole_img.get_height() // 2))
-            if pygame.time.get_ticks() - blackhole_display_start_time >= 15000:
+            if pygame.time.get_ticks() - blackhole_display_start_time >= 15000: #enough? time to get the joke I hope)
                 running = False
 
     # Spawning cats + saved picture
@@ -242,7 +246,7 @@ while running:
             display_collected = True
             display_start_time = pygame.time.get_ticks()
 
-            if not custom_objects:  # If all kitties gone, spawn new
+            if not custom_objects:  # If all kitties r gone, spawn new
                 spawn_objects(4)
 
     # Pointer stuff
@@ -251,7 +255,6 @@ while running:
     rotated_pointer = rotate_image(pointer_img, -pointer_angle)
     pointer_rect = rotated_pointer.get_rect(center=mouse_pos)
     screen.blit(rotated_pointer, pointer_rect.topleft)
-    #fps+game exit stuff
     pygame.display.flip()
     pygame.time.Clock().tick(60)
 ## end of main loop
