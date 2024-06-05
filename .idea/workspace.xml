@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b02c1a3f-7a20-4d77-89f8-92409471ee67" name="Changes" comment="I guess done">
-      <change afterPath="$PROJECT_DIR$/assets/stars-of-the-lidflac.flac" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/stars-of-the-lidmp3.mp3" afterDir="false" />
+    <list default="true" id="b02c1a3f-7a20-4d77-89f8-92409471ee67" name="Changes" comment="Final balancing changes :'D">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stars-of-the-lid.flac" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -197,7 +194,9 @@
       <workItem from="1717438217353" duration="749000" />
       <workItem from="1717439248385" duration="40000" />
       <workItem from="1717439577506" duration="51000" />
-      <workItem from="1717509231490" duration="6432000" />
+      <workItem from="1717509231490" duration="6720000" />
+      <workItem from="1717529321719" duration="654000" />
+      <workItem from="1717561083981" duration="607000" />
     </task>
     <task id="LOCAL-00001" summary="first draft">
       <option name="closed" value="true" />
@@ -263,7 +262,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717437901024</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Final balancing changes :'D">
+      <option name="closed" value="true" />
+      <created>1717529000906</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1717529000906</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,12 +281,13 @@
     <MESSAGE value="first draft" />
     <MESSAGE value="not bad" />
     <MESSAGE value="I guess done" />
-    <option name="LAST_COMMIT_MESSAGE" value="I guess done" />
+    <MESSAGE value="Final balancing changes :'D" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final balancing changes :'D" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Gravity_Golf$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1717398977438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gravity_Golf$sky_shootout.coverage" NAME="sky_shootout Coverage Results" MODIFIED="1717416408881" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/OneDrive/Desktop/Burger_Sebastian" />
-    <SUITE FILE_PATH="coverage/Gravity_Golf$main.coverage" NAME="main Coverage Results" MODIFIED="1717528729653" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gravity_Golf$main.coverage" NAME="main Coverage Results" MODIFIED="1717528791556" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gravity_Golf$test_file.coverage" NAME="test file Coverage Results" MODIFIED="1717397775725" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
