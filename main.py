@@ -10,10 +10,10 @@ import random
 pygame.init()
 pygame.font.init()
 #soundtrack
-pygame.mixer.init()
-pygame.mixer.music.load('assets/stars-of-the-lidmp3.mp3') # got original .flac but it's 40MBs, mp3 was 10 :)
-pygame.mixer.music.play(-1) #(-1)==music loops
-pygame.mixer.music.set_volume(0.03)
+#pygame.mixer.init()
+#pygame.mixer.music.load('assets/stars-of-the-lidmp3.mp3') # got original .flac but it's 40MBs, mp3 was 10 :)
+#pygame.mixer.music.play(-1) #(-1)==music loops
+#pygame.mixer.music.set_volume(0.03)
  
 #often used constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720
@@ -53,6 +53,7 @@ LEVELS = [
 #Assets stuff
 FONT = 'assets/font.ttf'
 the_font = pygame.font.Font(FONT, size=50)
+text_2 = the_font.render(f'You have saved 0 kitties!', False, (255, 255, 255))
 END_SCREEN_IMG = 'assets/end.png'
 POINTER_IMG = 'assets/pointer.png'
 OBJECT_IMGS = ['assets/cat1.png', 'assets/cat3.png', 'assets/cat2.png']
@@ -132,8 +133,8 @@ def check_object_collision(ball_pos, obj_pos):
     "size" for better collision detection.
     """
     extra = 13 
-    return (obj_pos[0] - OBJECT_SIZE / 2 - extra <= ball_pos[0] <= obj_pos[0] + OBJECT_SIZE / 2 + extra and
-            obj_pos[1] - OBJECT_SIZE / 2 - extra <= ball_pos[1] <= obj_pos[1] + OBJECT_SIZE / 2 + extra)
+    return (obj_pos[0] - OBJECT_SIZE / 2 <= ball_pos[0] <= obj_pos[0] + OBJECT_SIZE / 2 + extra and
+            obj_pos[1] - OBJECT_SIZE / 2 <= ball_pos[1] <= obj_pos[1] + OBJECT_SIZE / 2 + extra)
 
 
 def game_over():
@@ -278,7 +279,7 @@ while running:
         if check_object_collision(ball_position, obj['pos']):
             custom_objects.remove(obj)
             points +=1
-            text_2 = the_font.render(f'You have saved {points} kitties!', False, (255, 255, 255))
+            text_2 = the_font.render(f'You have saved {points} kittie(s)!', False, (255, 255, 255))
             display_collected = True
             display_start_time = pygame.time.get_ticks()
 
